@@ -1,6 +1,9 @@
 # CAN Bus Documentation
 https://www.klipper3d.org/CANBUS.html
 
+## Getting MCU on can0
+In this section we are trying to get the Pi and MCU to communicate over CAN.
+
 ## Edit pi files
 Create file can0
 ```
