@@ -42,3 +42,16 @@ Correct output (UUID will vary)
 Found canbus_uuid=97e284228de1, Application: Klipper
 Total 1 uuids found
 ```
+
+## Getting EBB42 on can0
+
+```
+cd ~
+git clone https://github.com/Arksine/katapult
+cd katapult
+make menuconfig
+```
+
+```
+make
+```
