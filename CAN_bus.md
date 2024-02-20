@@ -55,3 +55,16 @@ make menuconfig
 ```
 make
 ```
+
+
+    Micro-controller Architecture: STMicroelectronics STM32
+    Processor model: STM32G0B1
+    Build CanBoot deployment application: 8KiB bootloader
+    Clock Reference: 8 MHz crystal
+    Communication interface: CAN bus (on PB0/PB1)
+    Application start offset: 8KiB offset
+    CAN bus speed: 500000
+    Support bootloader entry on rapid double click of reset button: check (optional but recommend)
+    Enable Status LED: check
+    Status LED GPIO Pin: PA13
+
