@@ -76,3 +76,16 @@ type: git_repo
 origin: https://github.com/Arksine/katapult.git
 path: ~/katapult
 is_system_service: False
+
+
+
+```
+dfu-util -l
+dfu-util -a 0 -D ~/katapult/out/katapult.bin -s 0x08000000:mass-erase:force:leave
+```
+
+
+Update
+```
+python3 ~/katapult/scripts/flash_can.py -f ~/katapult/out/katapult.bin -i can0 -u <uuid>
+```
