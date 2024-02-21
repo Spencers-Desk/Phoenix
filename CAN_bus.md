@@ -68,3 +68,10 @@ Micro-controller Architecture: STMicroelectronics STM32
     Enable Status LED: check
     Status LED GPIO Pin: PA13
 
+
+# katapult update manager
+[update_manager katapult]
+type: git_repo
+origin: https://github.com/Arksine/katapult.git
+path: ~/katapult
+is_system_service: False
