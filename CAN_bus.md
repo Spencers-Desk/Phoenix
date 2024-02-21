@@ -3,6 +3,10 @@ The first part of this guide was sourced from: https://www.klipper3d.org/CANBUS.
 
 The katapult github repository is found here: https://github.com/Arksine/katapult
 
+EBB42 documentation: https://github.com/bigtreetech/EBB/blob/master/EBB%20CAN%20V1.1%20(STM32G0B1)/EBB42%20CAN%20V1.1/BIGTREETECH%20EBB42%20CAN%20V1.1%20User%20Manual.pdf
+
+Manta E3EZ repository: https://github.com/bigtreetech/Manta-E3EZ/tree/master
+
 The remaining information was pieced together from accross the internet and BTT documentation.
 
 # Get Raspberry Pi Ready
