@@ -53,6 +53,7 @@ make menuconfig
 ```
 
 ```
+make clean
 make
 ```
 
