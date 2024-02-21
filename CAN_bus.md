@@ -1,6 +1,8 @@
 # CAN Bus Documentation
 The first part of this guide was sourced from: https://www.klipper3d.org/CANBUS.html
+
 The katapult github repository is found here: https://github.com/Arksine/katapult
+
 The remaining information was pieced together from accross the internet and BTT documentation.
 
 # Get Raspberry Pi Ready
@@ -115,6 +117,7 @@ The following is the configuration I used for the EBB42 klipper firmware.
 Press "q" to quit and "y" to save the menuconfig.
 
 Use the following command to generate the klipper firmware for the EBB42. No need to do anything further with the firmware for now.
+
 
 
 ### katapult (Formerly CanBoot)
