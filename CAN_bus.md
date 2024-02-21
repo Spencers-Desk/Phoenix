@@ -1,191 +1,11 @@
 # CAN Bus Documentation
-https://www.klipper3d.org/CANBUS.html
-
-## Getting MCU on can0
-In this section we are trying to get the Pi and MCU to communicate over CAN.
-
-## Edit pi files
-Create file can0
-```
-sudo nano /etc/network/interfaces.d/can0
-```
-Add below to the file
-```
-allow-hotplug can0
-iface can0 can static
-    bitrate 1000000
-    up ifconfig $IFACE txqueuelen 128
-```
-
-## make menuconfig
-```
-make menuconfig
-```
-
-```
-USB to CAN adapter
-CAN PB12/PB13
-```
-rename from klipper.bin to firmware.bin
-copy to SD card
-insert into motherboard
-power off then power on the motherboard (power cycle)
-Give the MCU time to flash the new firmware
-Once flashed, poweroff
-Remove SD card
-poweron
-```
-~/klippy-env/bin/python ~/klipper/scripts/canbus_query.py can0
-```
-Correct output (UUID will vary)
-```
-Found canbus_uuid=97e284228de1, Application: Klipper
-Total 1 uuids found
-```
-
-## Getting katapult on EBB42
-
-```
-cd ~
-git clone https://github.com/Arksine/katapult
-cd katapult
-make menuconfig
-```
-
-```
-make clean
-make
-```
-
-
-Micro-controller Architecture: STMicroelectronics STM32
-    Processor model: STM32G0B1
-    Build CanBoot deployment application: 8KiB bootloader
-    Clock Reference: 8 MHz crystal
-    Communication interface: CAN bus (on PB0/PB1)
-    Application start offset: 8KiB offset
-    CAN bus speed: 1000000
-    Support bootloader entry on rapid double click of reset button: check (optional but recommend)
-    Enable Status LED: check
-    Status LED GPIO Pin: PA13
-
-
-# katapult update manager
-[update_manager katapult]
-type: git_repo
-origin: https://github.com/Arksine/katapult.git
-path: ~/katapult
-is_system_service: False
-
-add 120ohm jumper
-add vbus jumper
-hold boot
-press reset or unplug and plug in usbc
-
-```
-dfu-util -l
-dfu-util -a 0 -D ~/katapult/out/katapult.bin -s 0x08000000:mass-erase:force:leave
-```
-
-Hold boot and press reset or unplug and plug in usb-c
-```
-dfu-util -l
-dfu-util -a 0 -D ~/klipper/out/klipper.bin -s 0x08000000:mass-erase:force:leave
-```
-
-unplug
-remove vbus jumper
-
-Run
-```
-~/klippy-env/bin/python ~/klipper/scripts/canbus_query.py can0
-```
-Expected output
-```
-Found canbus_uuid=3a96aa35ffaf, Application: CanBoot
-Total 1 uuids found
-```
-
-
-Update
-```
-python3 ~/katapult/scripts/flash_can.py -f ~/katapult/out/katapult.bin -i can0 -u <uuid>
-```
-
-Expected Output
-```
-Sending bootloader jump command...
-Resetting all bootloader node IDs...
-Attempting to connect to bootloader
-Katapult Connected
-Protocol Version: 1.0.0
-Block Size: 64 bytes
-Application Start: 0x8002000
-MCU type: stm32g0b1xx
-Verifying canbus connection
-Flashing '/home/pi/katapult/out/katapult.bin'...
-
-[##################################################]
-
-Write complete: 3 pages
-Verifying (block count = 71)...
-
-[##################################################]
-
-Verification Complete: SHA = 1FDE23A73D08F56478928578133AA23A2F360F57
-Flash Success
-```
-Power Cycle the EBB42
-
-## Getting Klipper on EBB42
-
-```
-cd ~/klipper
-make menuconfig
-```
-
-
-Enable extra low-level configuration options: check
-    Micro-controller Architecture: STMicroelectronics STM32
-    Processor model: STM32G0B1
-    Bootloader offset: No bootloader (without CanBoot)
-    Bootloader offset: 8KiB bootloader (with CanBoot)
-    Clock Reference: 8 MHz crystal
-    Communication interface: CAN bus (on PB0/PB1)
-    CAN bus speed: 1000000
-
-```
-make clean
-make
-```
-
-Get UUID
-```
-python3 ~/katapult/scripts/flash_can.py -i can0 -q
-```
-Flash firmware
-```
-python3 ~/katapult/scripts/flash_can.py -f ~/klipper/out/klipper.bin -i can0 -u <uuid>
-```
-
-
-
-
-
-
-
-
-
-
-
-
+The first part of this guide was sourced from: https://www.klipper3d.org/CANBUS.html
+The katapult github repository is found here: https://github.com/Arksine/katapult
+The remaining information was pieced together from accross the internet and BTT documentation.
 
 # Get Raspberry Pi Ready
 Before we get CanBoot going we need to prepare our klipper host, a Raspberry Pi CM4 in this case...
 
-The first part of this guide was sourced from: https://www.klipper3d.org/CANBUS.html
-The katapult github repository is found here: https://github.com/Arksine/katapult
-The remaining information was pieced together from accross the internet and BTT documentation.
 
 ## Edit can0 file
 The purpose of this section is to allow our CM4 to communicate across the can0 network. This is simply done by creating a file called can0.
@@ -405,16 +225,58 @@ Download done.
 File downloaded successfully
 dfu-util: Error during download get_status
 ```
-If you were successful, go ahead and unplug the EBB42 from the USB. **Don't forget to remove the VBUS jumper**. Go ahead and plug the CAN cable back in.
+If you were successful, go ahead and unplug the EBB42 from the USB. **Don't forget to remove the VBUS jumper**. Go ahead and plug the CAN cable back in. After that, power your printer back on.
 
-Run
+### Install klipper
+If you've been following the guide closely and everything has worked well enough then you should be on the home stretch now. Just a few more commands. Enter the following to see if we can see all of the CAN nodes on our network.
 ```
 ~/klippy-env/bin/python ~/klipper/scripts/canbus_query.py can0
 ```
-Expected output
+You should get an output similar to the following.
 ```
+Found canbus_uuid=97e284228de1, Application: Klipper
 Found canbus_uuid=3a96aa35ffaf, Application: CanBoot
-Total 1 uuids found
+Total 2 uuids found
+```
+CanBoot (the previous name of katapult) is the katapult node on our EBB42. The Klipper node is the CAN node on our control board's MCU. Now we can install the klipper firmware onto our EBB42 using the can0 network. Run the following command, altering the uuid to match your CanBoot uuid.
+```
+python3 ~/katapult/scripts/flash_can.py -f ~/klipper/out/klipper.bin -i can0 -u 3a96aa35ffaf
+```
+You should get an output similar to the following.
+```
+Sending bootloader jump command...
+Resetting all bootloader node IDs...
+Attempting to connect to bootloader
+Katapult Connected
+Protocol Version: 1.0.0
+Block Size: 64 bytes
+Application Start: 0x8002000
+MCU type: stm32g0b1xx
+Verifying canbus connection
+Flashing '/home/pi/klipper/out/klipper.bin'...
+
+[##################################################]
+
+Write complete: 14 pages
+Verifying (block count = 427)...
+
+[##################################################]
+
+Verification Complete: SHA = 3FB41182CF14BA6262D710E427DB93DB0D8E3732
+Flash Success
 ```
 
-### Install klipper
+Now klipper should be installed on the EBB42.
+
+# printer.cfg
+The final step is to configure our MCUs in the printer.cfg file.
+
+Make sure to add the following sections, adjusting the uuid to the ones you found.
+```
+[mcu]
+canbus_uuid: 97e284228de1
+
+[mcu EBB42]
+canbus_uuid: 3a96aa35ffaf
+```
+Restart klipper and you should be good to go!
